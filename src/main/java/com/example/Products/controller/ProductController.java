@@ -1,39 +1,38 @@
 package com.example.Products.controller;
 
 import com.example.Products.DTO.Products;
+import com.example.Products.service.ProductService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/base/products")
 public class ProductController {
 
-    private static List<Products> products = new ArrayList<>(List.of(
-            new Products(1,"Apple", "1000$"),
-            new Products(2,"Roku", "120$"),
-            new Products(3, "DeskTop","100$")
-    ));
-    @GetMapping("/getAll")
-    public ResponseEntity<List<Products>> getAll(){
+    @Autowired
+    private ProductService productService;
 
+    @GetMapping("/getAll")
+    public ResponseEntity<List<Products>> getAll() {
+        List<Products> products = productService.getAllProducts();
         return ResponseEntity.ok(products);
     }
+
     @GetMapping("/getBy/{id}")
-    public ResponseEntity<Products> getById(@PathVariable int id){
-        for (Products p : products){
-            if (p.getId() == id){
-                return ResponseEntity.ok(p);
-            }
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<Optional<Products>> getById(@PathVariable int id) {
+        Optional<Products> p = productService.getProductById(id);
+        return p.map(products -> ResponseEntity.ok(p)).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/create/products")
-    public ResponseEntity<String> postProduct(@RequestBody Products p){
-        products.add(p);
-        return ResponseEntity.ok("Product Created Successfully");
+    public ResponseEntity<String> postProduct(@RequestBody Products p) {
+        productService.addProduct(p);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Product Created Successfully");
     }
 }

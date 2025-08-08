@@ -17,10 +17,12 @@ public class Products {
     private int id;
     private String productName;
     private String price;
+    private String category;
 
-    public Products(int id, String name, String price) {
+    public Products(int id, String name, String price, String category) {
         this.id = id;
         this.productName = name;
         this.price = price;
+        this.category = category;
     }
 }
